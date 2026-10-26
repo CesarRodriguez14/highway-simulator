@@ -32,7 +32,7 @@ echo "========================================="
 echo "Capturing coverage data..."
 echo "========================================="
 # 1. Capture baseline
-lcov --capture --initial --directory . --output-file coverage_base.info
+lcov --capture --initial --directory . --output-file coverage_base.info --ignore-errors mismatch
 
 lcov --remove coverage_base.info \
      '/usr/*' \
@@ -40,10 +40,11 @@ lcov --remove coverage_base.info \
      '*/tests/*' \
      '*googletest*' \
      '*googlemock*' \
-     --output-file filtered_coverage_base.info
+     --output-file filtered_coverage_base.info \
+     --ignore-errors unused
 
 # 2. Capture test execution data
-lcov --capture --directory . --output-file coverage_test.info
+lcov --capture --directory . --output-file coverage_test.info --ignore-errors mismatch
 
 lcov --remove coverage_test.info \
      '/usr/*' \
@@ -51,7 +52,8 @@ lcov --remove coverage_test.info \
      '*/tests/*' \
      '*googletest*' \
      '*googlemock*' \
-     --output-file filtered_coverage_test.info
+     --output-file filtered_coverage_test.info \
+     --ignore-errors unused
 
 # 3. Combine trace files
 lcov --add-tracefile filtered_coverage_base.info \
