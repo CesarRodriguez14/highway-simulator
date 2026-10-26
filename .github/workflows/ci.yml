@@ -1,0 +1,50 @@
+name: CI & Coverage
+
+on:
+  push:
+    branches: ["master", "*dev"]
+  
+  pull_request:
+    branches: ["master"]
+
+#Permissions required to deploy Github Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake lcov
+
+    - name: Change scripts/coverage.sh mode and run
+      run: |
+        chmod +x scripts/coverage.sh
+        ./scripts/coverage.sh
+
+    - name: Upload Coverage HTML Report for Pages
+      uses: actions/upload-pages-artifact@v4
+      with:
+        path: 'build/coverage_html/'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-24.04
+    needs: build-and-test
+    if: github.ref == 'refs/heads/master' || endsWith(github.ref,'dev')
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+    
