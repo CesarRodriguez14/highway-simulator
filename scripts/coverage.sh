@@ -34,12 +34,28 @@ echo "========================================="
 # 1. Capture baseline
 lcov --capture --initial --directory . --output-file coverage_base.info
 
+lcov --remove coverage_base.info \
+     '/usr/*' \
+     '*/_deps/*' \
+     '*/tests/*' \
+     '*googletest*' \
+     '*googlemock*' \
+     --output-file filtered_coverage_base.info
+
 # 2. Capture test execution data
 lcov --capture --directory . --output-file coverage_test.info
 
+lcov --remove coverage_test.info \
+     '/usr/*' \
+     '*/_deps/*' \
+     '*/tests/*' \
+     '*googletest*' \
+     '*googlemock*' \
+     --output-file filtered_coverage_test.info
+
 # 3. Combine trace files
-lcov --add-tracefile coverage_base.info \
-     --add-tracefile coverage_test.info \
+lcov --add-tracefile filtered_coverage_base.info \
+     --add-tracefile filtered_coverage_test.info \
      --output-file coverage_total.info
 
 # 4. Filter out system libraries, dependencies, and test files
